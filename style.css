@@ -1,0 +1,64 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== CONTROLES ===== */
+#controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  padding: 10px;
+  font-size: 12px;
+  z-index: 999;
+}
+
+#controls label {
+  display: block;
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+  position: relative;
+  width: 900px;   /* format naturel du rectangle */
+  height: 180px;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Zone de défilement avec marges */
+.carousel {
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 420px;   /* 👈 3 icônes MAX */
+  height: 110px;
+
+  overflow: hidden;
+  z-index: 2;
+}
+
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  will-change: transform;
+}
+
+.track img {
+  width: 110px;
+  flex-shrink: 0;
+}
