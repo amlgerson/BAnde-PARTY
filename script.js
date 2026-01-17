@@ -1,9 +1,11 @@
-const SPEED = 0.4; // vitesse du défilement (pixels / frame)
+const SPEED = 0.4;
 const GAP = 30;
 const STORAGE_KEY = "aml_party_state";
+const CHANNEL_NAME = "aml_party_channel";
 
 const track = document.getElementById("track");
 const checkboxes = document.querySelectorAll("#controls input");
+const channel = new BroadcastChannel(CHANNEL_NAME);
 
 let offset = 0;
 let icons = [];
@@ -17,13 +19,14 @@ function saveState() {
     state[cb.dataset.id] = cb.checked;
   });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  channel.postMessage(state); // 🔥 synchro OBS
 }
 
-function loadState() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return;
+function loadState(stateFromChannel = null) {
+  const state = stateFromChannel
+    ? stateFromChannel
+    : JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 
-  const state = JSON.parse(saved);
   checkboxes.forEach(cb => {
     if (state.hasOwnProperty(cb.dataset.id)) {
       cb.checked = state[cb.dataset.id];
@@ -34,8 +37,8 @@ function loadState() {
 /* =======================
    CONSTRUCTION DU TRACK
 ======================= */
-function buildTrack() {
-  loadState();
+function buildTrack(state = null) {
+  loadState(state);
   track.innerHTML = "";
   offset = 0;
 
@@ -45,14 +48,15 @@ function buildTrack() {
 
   if (active.length === 0) return;
 
-  // duplication pour boucle infinie
-  icons = [...active, ...active];
+  const loopIcons = [...active, ...active];
 
-  icons.forEach(id => {
+  loopIcons.forEach(id => {
     const img = document.createElement("img");
     img.src = `icons/${id}.png`;
     track.appendChild(img);
   });
+
+  icons = loopIcons;
 }
 
 /* =======================
@@ -66,13 +70,10 @@ function animate() {
 
   offset -= SPEED;
 
-  const firstIcon = track.children[0];
-  const iconWidth = firstIcon.offsetWidth + GAP;
+  const iconWidth = track.children[0].offsetWidth + GAP;
   const resetPoint = iconWidth * (icons.length / 2);
 
-  if (Math.abs(offset) >= resetPoint) {
-    offset = 0;
-  }
+  if (Math.abs(offset) >= resetPoint) offset = 0;
 
   track.style.transform = `translateX(${offset}px)`;
   requestAnimationFrame(animate);
@@ -88,10 +89,10 @@ checkboxes.forEach(cb =>
   })
 );
 
-// synchro inter-onglets (OBS <-> navigateur)
-window.addEventListener("storage", () => {
-  buildTrack();
-});
+// 🔥 RÉCEPTION DES UPDATES (OBS)
+channel.onmessage = (event) => {
+  buildTrack(event.data);
+};
 
 /* =======================
    MODE OBS
