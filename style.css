@@ -1,9 +1,9 @@
 html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent !important;
+  width: 900px;
+  height: 180px;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -25,8 +25,12 @@ html, body {
 
 /* ===== OVERLAY ===== */
 .overlay {
-  background: transparent !important;
+  position: relative;
+  width: 900px;
+  height: 180px;
+  background: transparent;
 }
+
 
 
 .background {
@@ -63,4 +67,5 @@ html, body {
   width: 110px;
   flex-shrink: 0;
 }
+
 
